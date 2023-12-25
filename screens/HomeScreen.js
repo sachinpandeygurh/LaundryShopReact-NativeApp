@@ -13,7 +13,7 @@ import React, { useEffect, useState } from "react";
 import { Feather } from "@expo/vector-icons";
 import * as Location from "expo-location";
 import { MaterialIcons } from "@expo/vector-icons";
-import Carousel from "../components/Carousel";
+// import Carousel from "../components/Carousel";
 import Services from "../components/Services";
 import DressItem from "../components/DressItem";
 import { useDispatch, useSelector } from "react-redux";
@@ -57,7 +57,7 @@ const HomeScreen = () => {
     }
   };
   const getCurrentLocation = async () => {
-    let { status } = await Location.requestForegroundPermissionsAsync();
+    let { status } = await Location.requestForegroundPermissionsAsync(); 
 
     if (status !== "granted") {
       Alert.alert(
@@ -203,7 +203,7 @@ const HomeScreen = () => {
         </View>
 
         {/* Image Carousel */}
-        <Carousel />
+        {/* <Carousel /> */}
 
         {/* Services Component */}
         <Services />
@@ -231,11 +231,11 @@ const HomeScreen = () => {
           >
             <View>
               <Text style={{fontSize:17,fontWeight:"600",color:"white"}}>{cart.length} items |  $ {total}</Text>
-              <Text style={{fontSize:15,fontWeight:"400",color:"white",marginVertical:6}}>extra charges might apply</Text>
+              <Text style={styles.conditions}>extra charges might apply</Text>
             </View>
     
             <Pressable onPress={() => navigation.navigate("PickUp")}>
-              <Text style={{fontSize:17,fontWeight:"600",color:"white"}}>Proceed to pickup</Text>
+              <Text style={styles.pickupbtn}>Proceed to pickup</Text>
             </Pressable>
           </Pressable>
           )}
@@ -246,4 +246,23 @@ const HomeScreen = () => {
 
 export default HomeScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  conditions:{fontSize:10,fontWeight:"400",color:"white",marginVertical:6},
+  pickupbtn:{
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    elevation: 3,
+    margin: 10,
+    fontWeight: 'bold',
+    paddingHorizontal:10,
+    paddingVertical:10,
+    color:"red",
+    fontSize:17
+  }
+});

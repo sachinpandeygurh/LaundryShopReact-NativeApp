@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -6,120 +7,46 @@ import {
   TextInput,
   Pressable,
   ScrollView,
-  Alert
+  Alert,
 } from "react-native";
-import React, { useState } from "react";
 import HorizontalDatepicker from "@awrminkhodaei/react-native-horizontal-datepicker";
 import { useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 
 const PickUpScreen = () => {
   const [selectedDate, setSelectedDate] = useState("");
+  const [selectedTime, setSelectedTime] = useState("");
+  const [delivery, setDelivery] = useState("");
   const cart = useSelector((state) => state.cart.cart);
-  const total = cart
-    .map((item) => item.quantity * item.price)
-    .reduce((curr, prev) => curr + prev, 0);
-  const [selectedTime, setSelectedTime] = useState([]);
-  const [delivery, setDelivery] = useState([]);
-  const deliveryTime = [
-    {
-      id: "0",
-      name: "2-3 Days",
-    },
-    {
-      id: "1",
-      name: "3-4 Days",
-    },
-    {
-      id: "2",
-      name: "4-5 Days",
-    },
-    {
-      id: "3",
-      name: "5-6 Days",
-    },
-    {
-      id: "4",
-      name: "Tommorrow",
-    },
-  ];
-
-  const times = [
-    {
-      id: "0",
-      time: "11:00 PM",
-    },
-    {
-      id: "1",
-      time: "12:00 PM",
-    },
-    {
-      id: "2",
-      time: "1:00 PM",
-    },
-    {
-      id: "2",
-      time: "2:00 PM",
-    },
-    {
-      id: "4",
-      time: "3:00 PM",
-    },
-    {
-      id: "5",
-      time: "4:00 PM",
-    },
-  ];
+  const total = cart.reduce((acc, item) => acc + item.quantity * item.price, 0);
+  const deliveryTime = ["2-3 Days", "3-4 Days", "4-5 Days", "5-6 Days", "Tomorrow"];
+  const times = ["11:00 PM", "12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM"];
   const navigation = useNavigation();
-  const proceedToCart = () => {
-      if(!selectedDate || !selectedTime || !delivery){
-        Alert.alert(
-            "Empty or invalid",
-            "Please select all the fields",
-            [
-              {
-                text: "Cancel",
-                onPress: () => console.log("Cancel Pressed"),
-                style: "cancel"
-              },
-              { text: "OK", onPress: () => console.log("OK Pressed") }
-            ],
-            { cancelable: false }
-          );
-      }
-      if(selectedDate && selectedTime && delivery){
-        navigation.replace("Cart",{
-            pickUpDate:selectedDate,
-            selectedTime:selectedTime,
-            no_Of_days:delivery,
 
-        })
-      }
-  }
+  const proceedToCart = () => {
+    if (!selectedDate || !selectedTime || !delivery) {
+      Alert.alert("Empty or invalid", "Please select all the fields", [
+        { text: "OK", onPress: () => console.log("OK Pressed") },
+      ]);
+    } else {
+      navigation.replace("Cart", {
+        pickUpDate: selectedDate,
+        selectedTime: selectedTime,
+        no_Of_days: delivery,
+      });
+    }
+  };
 
   return (
-    <>
-      <SafeAreaView>
-        <Text style={{ fontSize: 16, fontWeight: "500", marginHorizontal: 10 }}>
-          enter Address
-        </Text>
-        <TextInput
-          style={{
-            padding: 40,
-            borderColor: "gray",
-            borderWidth: 0.7,
-            paddingVertical: 80,
-            borderRadius: 9,
-            margin: 10,
-          }}
-        />
+    <ScrollView style={styles.container}>
+      <SafeAreaView style={styles.safeArea}>
+        <Text style={styles.label}>Enter Address</Text>
+        <TextInput style={styles.input} />
 
-        <Text style={{ fontSize: 16, fontWeight: "500", marginHorizontal: 10 }}>
-          Pick Up Date
-        </Text>
+        <Text style={styles.label}>Pick Up Date</Text>
         <HorizontalDatepicker
           mode="gregorian"
-          startDate={new Date("2023-02-21")}
+          startDate={new Date("2023-02-01")}
           endDate={new Date("2023-02-28")}
           initialSelectedDate={new Date("2020-08-22")}
           onSelectedDateChange={(date) => setSelectedDate(date)}
@@ -134,111 +61,130 @@ const PickUpScreen = () => {
           flatListContainerStyle={styles.flatListContainerStyle}
         />
 
-        <Text style={{ fontSize: 16, fontWeight: "500", marginHorizontal: 10 }}>
-          Select Time
-        </Text>
-
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        <Text style={styles.label}>Select Time</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollContainer}>
           {times.map((item, index) => (
             <Pressable
               key={index}
-              onPress={() => setSelectedTime(item.time)}
-              style={
-                selectedTime.includes(item.time)
-                  ? {
-                      margin: 10,
-                      borderRadius: 7,
-                      padding: 15,
-                      borderColor: "red",
-                      borderWidth: 0.7,
-                    }
-                  : {
-                      margin: 10,
-                      borderRadius: 7,
-                      padding: 15,
-                      borderColor: "gray",
-                      borderWidth: 0.7,
-                    }
-              }
+              onPress={() => setSelectedTime(item)}
+              style={[
+                styles.pressable,
+                selectedTime === item ? styles.selectedPressable : styles.unselectedPressable,
+              ]}
             >
-              <Text>{item.time}</Text>
+              <Text>{item}</Text>
             </Pressable>
           ))}
         </ScrollView>
-        <Text style={{ fontSize: 16, fontWeight: "500", marginHorizontal: 10 }}>
-          Delivery Date
-        </Text>
 
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        <Text style={styles.label}>Delivery Date</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollContainer}>
           {deliveryTime.map((item, i) => (
             <Pressable
-              style={
-                delivery.includes(item.name)
-                  ? {
-                      margin: 10,
-                      borderRadius: 7,
-                      padding: 15,
-                      borderColor: "red",
-                      borderWidth: 0.7,
-                    }
-                  : {
-                      margin: 10,
-                      borderRadius: 7,
-                      padding: 15,
-                      borderColor: "gray",
-                      borderWidth: 0.7,
-                    }
-              }
-              onPress={() => setDelivery(item.name)}
               key={i}
+              style={[
+                styles.pressable,
+                delivery === item ? styles.selectedPressable : styles.unselectedPressable,
+              ]}
+              onPress={() => setDelivery(item)}
             >
-              <Text>{item.name}</Text>
+              <Text>{item}</Text>
             </Pressable>
           ))}
         </ScrollView>
       </SafeAreaView>
 
-      {total === 0 ? null : (
-        <Pressable
-          style={{
-            backgroundColor: "#088F8F",
-            marginTop:"auto",
-            padding: 10,
-            marginBottom: 40,
-            margin: 15,
-            borderRadius: 7,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
+      {total !== 0 && (
+        <Pressable style={styles.totalContainer} onPress={proceedToCart}>
           <View>
-            <Text style={{ fontSize: 17, fontWeight: "600", color: "white" }}>
-              {cart.length} items | $ {total}
-            </Text>
-            <Text
-              style={{
-                fontSize: 15,
-                fontWeight: "400",
-                color: "white",
-                marginVertical: 6,
-              }}
-            >
-              extra charges might apply
-            </Text>
+            <Text style={styles.totalText}>{cart.length} items | $ {total}</Text>
+            <Text style={styles.conditions}>Extra charges might apply</Text>
           </View>
 
-          <Pressable onPress={proceedToCart}>
-            <Text style={{ fontSize: 17, fontWeight: "600", color: "white" }}>
-              Proceed to Cart
-            </Text>
-          </Pressable>
+          <Text style={styles.proceedBtn}>Proceed to Cart</Text>
         </Pressable>
       )}
-    </>
+    </ScrollView>
   );
 };
 
-export default PickUpScreen;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#F0F0F0",
+    marginTop: 50,
+  },
+  safeArea: {
+    paddingHorizontal: 10,
+    backgroundColor: "#f0f4f0",
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: "500",
+    marginHorizontal: 10,
+  },
+  input: {
+    padding: 10,
+    borderColor: "gray",
+    borderWidth: 0.7,
+    borderRadius: 9,
+    margin: 10,
+  },
+  scrollContainer: {
+    flexDirection: "row",
+  },
+  pressable: {
+    margin: 10,
+    borderRadius: 7,
+    padding: 15,
+    borderColor: "gray",
+    borderWidth: 0.7,
+  },
+  selectedPressable: {
+    borderColor: "red",
+  },
+  unselectedPressable: {
+    borderColor: "gray",
+  },
+  totalContainer: {
+    backgroundColor: "#088F8F",
+    marginTop: "auto",
+    padding: 10,
+    marginBottom: 40,
+    margin: 15,
+    borderRadius: 7,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  totalText: {
+    fontSize: 17,
+    fontWeight: "600",
+    color: "white",
+  },
+  conditions: {
+    fontSize: 10,
+    fontWeight: "400",
+    color: "white",
+    marginVertical: 6,
+  },
+  proceedBtn: {
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    elevation: 3,
+    margin: 10,
+    fontWeight: "bold",
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    color: "red",
+    fontSize: 17,
+  },
+});
 
-const styles = StyleSheet.create({});
+export default PickUpScreen;
